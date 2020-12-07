@@ -1,0 +1,36 @@
+.section init
+    .temps r6, r7
+    .zero r0
+.section text
+    printd:
+        push r1 on stack r2
+        push r3 on stack r2
+        push r4 on stack r2
+        r3 := m[r0][r2 + 3]
+
+        #case zero has leading 0
+        #case 0x800000000 special case
+        #case positive and negative
+
+        if (r3 <= 1001) goto base_case
+        #else print the n - 1 digits
+        
+
+    base_case:
+        output r3
+
+    todec:
+        push r1 on stack r2
+        push r3 on stack r2
+        push r4 on stack r2
+        r3 := m[r0][r2 + 3]
+        
+        loadval r3, r0
+        loadval r4, 1
+        if (r3 < 32) goto loop
+
+
+    loop:
+        # 2^r3 * 
+        add r3, r3, r4
+
