@@ -1,8 +1,40 @@
+# Calling Convention
+# r0 is 0
+# r1 is the return-address and result register 
+# r2 is the stack pointer 
+# r3, r4 are nonvolatiles
+# r5 is a volatile register
+# r6, r7 are temps
+
+
 .section init
     .temps r6, r7
     .zero r0
     jumptable:
     	.space 256
+
+    # initialize jumptable and set all values to "input_error"
+    # we have to implement input_error (see spec)
+
+# section init
+    # set all values in jump table digits
+    # ex. m[r0][jumptable + '0'] := number
+    # do this through 9
+
+# section text?
+    # this is where we do the input of number logic (move the number section
+    # here)
+    # may also need to clean up stack (unsure)
+
+# have a section for each function
+    # init
+        # set m[jmptable + 'character that makes the command'] := name of
+        # command's section
+    # text
+        # the logic of the function
+
+# section for main 
+
 .section jumptable
 	    if (r6 <= 9 && r6 >= -9) goto number
 

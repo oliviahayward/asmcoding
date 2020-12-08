@@ -1,13 +1,33 @@
 .section init
     .temps r6, r7
+    r0 =: 0
     .zero r0
 .section text
-    printd:
+    printd:  #should we send the whole value stack to print?
         pop r6 off stack r2     #number
         push r1 on stack r2
         push r3 on stack r2
         push r4 on stack r2
         r3 := m[r0][r2 + 3]
+
+        # enter printing loop
+        # if value stack is empty (r3) restore registers and go back to return
+        # address
+        # else get the value from the value stack rX = m[r3]
+        #      output ">>>"
+        #      increment counter
+        #      divide by 10
+        #      check if last digit --> goto actual printing section
+        #      push mod 10 on stack
+        #      loop until last digit
+        
+        # printing from stack - we should have all the values in the stack
+        #                     - i.e. the first val we pop is most significant
+        #     simple loop -- pop value off stack
+        #                    output value
+        #                    decrement counter
+        #     restore stack values and go back
+
 
         #case zero has leading 0
         #case 0x800000000 special case

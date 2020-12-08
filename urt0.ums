@@ -1,13 +1,19 @@
 .section init
     .temps r6, r7
+    r0 := 0
     .zero r0
     # r3, r4 nonvolatile registers
-     start:
-        r0 := 0
-        r2 := endstack	#stack
-        goto main linking r1
-        halt
+    #  start:
+    #     r0 := 0
+    #     r2 := endstack	#stack
+    #     goto main linking r1
+    #     halt
 
 .section data
     .space 100000
     endstack:
+    .space 10000
+    endvalstack:
+
+.section init 
+    r2:= endstack
