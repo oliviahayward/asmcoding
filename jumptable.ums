@@ -1,0 +1,139 @@
+.section init
+    .temps r6, r7
+    .zero r0
+    jumptable:
+    	.space 256
+.section jumptable
+	    if (r6 <= 9 && r6 >= -9) goto number
+
+        if (r6 == "\n") goto newline
+        
+        if (r6 == " ") goto space
+
+        if (r6 == "+") goto add
+
+        if (r6 == "-") goto sub
+
+        if (r6 == "*") goto mult
+        
+        if (r6 == "/") goto div
+        
+        if (r6 == "|") goto or
+
+        if (r6 == "&") goto and
+
+        if (r6 == "c") goto changesign
+
+        if (r6 == "~") goto neg
+
+        if (r6 == "s") goto swap
+
+        if (r6 == "d") goto dup
+
+        if (r6 == "p") goto pop
+
+        if (r6 == "z") goto zerostack
+
+    number:
+        if (r3 := 1) goto multnums
+        push r6 on stack r2 #entering
+        r3 := 1
+        goto input
+    newline:
+        r7 := 0
+        push r7 on stack r2
+        if (r2 > 2) goto printd
+
+        printd r2 #case multiple things on stack
+    space:
+    	r3 := 0
+        if true goto input #waiting again
+    add:
+        pop r7 off stack r2
+        pop r6 off stack r2
+        r6 := r6 + r7
+        push r3 on stack r2
+        push r6 on stack r2
+        goto input
+    sub:
+        pop r6 off stack r2
+        pop r7 off stack r2
+        loadval rt,0
+        nand rt,rt,rt
+        r6 := r6 * rt
+        r6 := r7 + r6
+        push r3 on stack r2
+        push r6 on stack r2
+        goto input
+    mul:
+        pop r7 off stack r2
+        pop r6 off stack r2
+        r6 := r6 * r7
+        push r3 on stack r2
+        push r6 on stack r2
+        goto input
+    div:
+        pop r7 off stack r2
+        pop r6 off stack r2
+        r6 := r6 / r7
+        push r3 on stack r2
+        push r6 on stack r2
+        goto input
+    or:
+        pop r7 off stack r2
+        pop r6 off stack r2
+        r6 := r6 | r7
+        push r3 on stack r2
+        push r6 on stack r2
+        goto input
+    and:
+        pop r7 off stack r2
+        pop r6 off stack r2
+        r6 := r6 & r7
+        push r3 on stack r2
+        push r6 on stack r2
+        goto input
+    changesign:
+        pop r6 off stack r2
+        r6 =: ~r6
+        r6 =: r6 + 1
+        push r3 on stack r2
+        push r6 on stack r2
+        goto input
+    neg:
+        pop r6 off stack r2
+        r6 =: ~r6
+        push r3 on stack r2
+        push r6 on stack r2
+        goto input
+    swap:
+        pop r6 off stack r2
+        pop r7 off stack r2
+        push r3 on stack r2     # multiple things on stack?
+        push r6 on stack r2
+        push r7 on stack r2
+        goto input
+    dup:
+        pop r6 off stack r2
+        r7 := r6
+        push r6 on stack r2
+        push r7 on stack r2
+        goto input
+    pop:
+        pop stack r2
+        goto input
+    zerostack:
+        pop r6 off stack r2
+        if (r2 != 0) goto zerostack
+        goto input
+    printstack:
+        pop r7 off stack r2
+        if (r2 > 1) goto printstack
+        goto input
+    multnums:
+    	pop r7 off stack r2
+    	r6 := r6 * 10
+    	r6 := r6 + r7
+        push r6 on stack r2
+        r3 := 1
+        goto input
