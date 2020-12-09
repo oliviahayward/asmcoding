@@ -1,3 +1,10 @@
+# Calling Convention
+# r0 is 0
+# r1 is the return-address and result register 
+# r2 is the stack pointer 
+# r3, r4 are nonvolatiles
+# r5 is a volatile register
+# r6, r7 are temps
 .section init
     .temps r6, r7
     r0 := 0
@@ -16,4 +23,5 @@
     endvalstack:
 
 .section init 
-    r2:= endstack
+    r2 := endstack
+    r3 := endvalstack
