@@ -15,9 +15,9 @@
 
 
 .section init
-    .temps r6, r7
-    r0 =: 0
     .zero r0
+    .temps r6, r7, r5
+    
 .section text
     printd:  #should we send the whole value stack to print?
         pop r6 off stack r2     #counter
@@ -25,7 +25,9 @@
         push r3 on stack r2
         push r4 on stack r2
         if (r3 == 0) goto exit_print
-        output(">>>")
+        output '>'
+        output '>'
+        output '>'
         goto print_loop
         
 
@@ -34,15 +36,15 @@
         # else get the value from the value stack rX = m[r3]
         pop r5 off stack r3
         r6 := r6 + 1 using r7
-        r7 := r5 mod 10
+        r7 := r5 mod 10 using r4
         push r7 on stack r3
-        if ( r7 == r5 ) goto base_case
-        r4 := r5 / 10
+        if ( r7 == r5 ) goto base_case 
+        r4 := r5 / 10 using r7
         push r4 on stack r3
         goto print_loop
 
     exit_print:
-        output("\n")
+        output '\n'
         pop r4 off stack r2
         pop r3 off stack r2
         pop r1 off stack r2
@@ -51,8 +53,9 @@
     base_case:
         if (r6 == 0) goto exit_print
         pop r7 off stack r3 
-        output(r7)
-        r6 := r6 - 1 using r7
+        output r7
+        r7 := -1
+        r6 := r6 + r7
         goto base_case
         # printing from stack - we should have all the values in the stack
         #                     - i.e. the first val we pop is most significant

@@ -1,19 +1,20 @@
 # Calling Convention
 # r0 is 0
-# r1 is the return-address and result register 
-# r2 is the stack pointer 
-# r3, r4 are nonvolatiles
-# r5 is a volatile register
+# r1 is the return-address and result register
+# r2 is the stack pointer
+# r3 is the valstack
+# r4, r5 are nonvolatiles
 # r6, r7 are temps
 .section init
-    .temps r6, r7
     .zero r0
-.section main
-    input:
-        r6 := input() #waiting
+    .temps r6, r7
+.section text
+    main:
+        push r1 on stack r2
+        r4 := input() #waiting
         push r6 on stack r3
-        r7 := 0
-        push r7 on stack r2
+        r5 := 0
+        push r5 on stack r2
         goto printd linking r1
-        halt
-
+        pop r1 off stack r2
+        goto r1

@@ -1,15 +1,16 @@
 # Calling Convention
 # r0 is 0
-# r1 is the return-address and result register 
-# r2 is the stack pointer 
+# r1 is the return-address and result register
+# r2 is the stack pointer
 # r3, r4 are nonvolatiles
 # r5 is a volatile register
 # r6, r7 are temps
 
 
 .section init
-    .temps r6, r7
     .zero r0
+    .temps r6, r7
+    r0 := 0
     jumptable:
     	.space 256
 
@@ -33,13 +34,13 @@
     # text
         # the logic of the function
 
-# section for main 
+# section for main
 
 .section jumptable
 	    if (r6 <= 9 && r6 >= -9) goto number
 
         if (r6 == "\n") goto newline
-        
+
         if (r6 == " ") goto space
 
         if (r6 == "+") goto add
@@ -47,9 +48,9 @@
         if (r6 == "-") goto sub
 
         if (r6 == "*") goto mult
-        
+
         if (r6 == "/") goto div
-        
+
         if (r6 == "|") goto or
 
         if (r6 == "&") goto and
