@@ -13,7 +13,7 @@
     # r3, r4 nonvolatile registers
     #  start:
     #     r0 := 0
-    #     r2 := endstack	#stack
+    #     r2 := endstack    #stack
     #     goto main linking r1
     #     halt
 

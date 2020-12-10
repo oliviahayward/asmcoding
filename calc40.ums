@@ -11,10 +11,12 @@
 .section text
     main:
         push r1 on stack r2
-        r4 := input() #waiting
-        push r6 on stack r3
-        r5 := 0
+        r4 := input() 		#user input
+        push r4 on stack r3
+        r5 := 0				#counter
         push r5 on stack r2
         goto printd linking r1
-        pop r1 off stack r2
-        goto r1
+        #pop r1 off stack r2
+        #goto r1
+        output 'p'
+        halt

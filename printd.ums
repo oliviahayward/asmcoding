@@ -16,14 +16,17 @@
 
 .section init
     .zero r0
-    .temps r6, r7, r5
+    .temps r6, r7
     
 .section text
     printd:  #should we send the whole value stack to print?
-        pop r6 off stack r2     #counter
-        push r1 on stack r2
-        push r3 on stack r2
-        push r4 on stack r2
+        pop r5 off stack r2     #counter
+        #output 'c'
+        #output '2'
+        #output ':'
+        r5 := r5 - '0'
+        #output r5
+        push r1 on stack r2     #return address
         if (r3 == 0) goto exit_print
         output '>'
         output '>'
@@ -34,32 +37,62 @@
 
     print_loop:
         # else get the value from the value stack rX = m[r3]
-        pop r5 off stack r3
-        r6 := r6 + 1 using r7
-        r7 := r5 mod 10 using r4
-        push r7 on stack r3
-        if ( r7 == r5 ) goto base_case 
-        r4 := r5 / 10 using r7
-        push r4 on stack r3
-        goto print_loop
+
+        # r4 is main value
+        # r5 is counter
+        # r6 and r7 used as temps
+
+        pop r4 off stack r3         #grab value
+        r5 := r5 + 1                #increasing count
+        #output 'c'
+        #output ':'
+        #r5 := r5 - '0'
+        #output r5
+        push r5 on stack r2
+        #push r1 on stack r2
+        r5 := 10
+        r1 := r4 mod r5             #getting the least significant digit
+        push r1 on stack r3         #pushing lsd onto value stack
+        #pop r1 off stack r2
+        #pop r5 off stack r2
+        #pop r7 off stack r3   
+        output 'g'
+        r2 := r2 + '0'
+        #output r2
+        if ( r1 == r4 ) goto base_case using r5     #if lsd = original value, then print
+        r1 := r4 / 10               #getting number without last digit
+        push r1 on stack r3         #pushes number without last digit to value stack
+        #pop r1 off stack r2
+        pop r5 off stack r2
+        goto print_loop             #restarts loop
 
     exit_print:
         output '\n'
-        pop r4 off stack r2
-        pop r3 off stack r2
-        pop r1 off stack r2
+        pop r1 off stack r2     #???
+        pop r1 off stack r2     #number of digits
+        output 'b'
+        goto r1
         #restore registers and go back to return
 
     base_case:
-        if (r6 == 0) goto exit_print
-        pop r7 off stack r3 
-        output r7
-        r7 := -1
-        r6 := r6 + r7
-        goto base_case
+        #push r1 on stack r2
+        pop r5 off stack r2
+        if (r5 == 0) goto exit_print using r1
+        #r5 := r5 + '48'
+        #output r5
+        pop r4 off stack r3             #grab most significant digit
+        #output '7'
+        r4 := r4 - '0'
+        #output r4                       #print msd                    
+        r5 := r5 - 1                   #decrement counter
+        push r5 on stack r2
+        #pop r1 off stack r2
+        #output 'h'
+             
         # printing from stack - we should have all the values in the stack
         #                     - i.e. the first val we pop is most significant
         #     simple loop -- pop value off stack
         #                    output value
         #                    decrement counter
         #     restore stack values and go back
+        goto base_case 
