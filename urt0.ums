@@ -29,3 +29,4 @@
         r0 := 0
         r2 := endstack
         r3 := endvalstack
+        goto callmain
