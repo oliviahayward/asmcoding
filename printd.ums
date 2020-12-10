@@ -57,7 +57,7 @@
         r4 := r4 + 48                   #if it works it works dont ask me how
         output r4                       #print msd
         r4 := r4 - 48                    
-        r5 := r5 - 1                   #decrement counter
+        r5 := r5 - 1                    #decrement counter
         pop r4 off stack r3 
         push r5 on stack r2
         goto base_case 

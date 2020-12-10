@@ -8,16 +8,110 @@
 .section init
     .zero r0
     .temps r6, r7
+    jumptable:
+        .space 256
+
+    init_table:
+        r5 := jumptable
+        r4 := jumptable + 256
+        goto init_table_loop
+    init_table_loop:
+        m[r0][r5] := input_error
+        r5 := r5 + 1
+        if (r4 == r5) goto main using r1
+        goto init_table_loop
+
+
+#################################################################
+# number function
+#################################################################
+.section init 
+    m[r0][jumptable + '0'] := number
+    m[r0][jumptable + '1'] := number
+    m[r0][jumptable + '2'] := number
+    m[r0][jumptable + '3'] := number
+    m[r0][jumptable + '4'] := number
+    m[r0][jumptable + '5'] := number
+    m[r0][jumptable + '6'] := number
+    m[r0][jumptable + '7'] := number
+    m[r0][jumptable + '8'] := number
+    m[r0][jumptable + '9'] := number
 .section text
+    number:
+        output 'q'
+        push r1 on stack r2 #return address
+        push r4 on stack r2 #nonvolatiles
+        push r5 on stack r2 
+        goto waiting #waiting again
+
+#################################################################
+# space function
+#################################################################
+.section init 
+    m[r0][jumptable + ' '] := space
+.section text
+    space: 
+        output 'e'
+        goto waiting #waiting again
+
+#################################################################
+# newline function
+#################################################################
+.section init 
+    m[r0][jumptable + '\n'] := newline
+.section text
+    newline: 
+        output 'a'
+        goto printd
+
+
+.section text
+    
+
+    waiting:
+        push r1 on stack r2
+        r4 := input() #12 2 +\n
+        r5 := jumptable + r4
+        r5 := m[r0][r5]
+        goto r5 linking r1
+
+        # while (stack is not empty)
+        #     need to get last character for r4 on stack
+        #     push r4 / 10 on stack r3
+
+        
+        
+        
+        
+        
+        # push r1 on stack r2 
+        # r4 := input() 		#user input
+        # output r4
+        # r5 := r4 - 48
+        # push r5 on stack r3
+        # r5 := jumptable + r4
+        # r5 := m[r0][r5]
+        # goto r5
+    input_error:
+        output 'q'
+        halt
+
     main:
         push r1 on stack r2
-        # r4 := input() 		#user input
-        # r4 := r4 - 48
-        r4 := 0
-        push r4 on stack r3
-        r5 := 0				#counter
-        push r5 on stack r2
-        goto printd linking r1
+        goto waiting linking r1
         pop r1 off stack r2
         goto r1
-        halt
+        
+        # r5 := 0				#counter
+        # push r5 on stack r2
+        # goto printd linking r1
+        # pop r1 off stack r2
+        # goto r1
+        # halt
+
+    #entering:
+
+
+   
+
+
