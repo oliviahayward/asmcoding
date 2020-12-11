@@ -4,4 +4,4 @@
 .section init
 	output "callmain\n"
 	goto main linking r1
-	halt
+	halt	

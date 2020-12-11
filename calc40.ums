@@ -39,11 +39,14 @@
 .section text
     number:
         output 'r'
+        pop r5 off stack r3 #entering or waiting state
         push r1 on stack r2 #return address
         r4 := r4 - 48
-        push r4 on stack r3 #nonvolatiles
-        push r5 on stack r2 
-        goto entering
+        push r4 on stack r3 #input
+        if (r5 == 1) goto entering using r4
+        r5 := 1
+        push r5 on stack r3 #setting entering state
+        goto waiting
 
 #################################################################
 # space function
@@ -53,41 +56,240 @@
 .section text
     space: 
         output "space\n"
-        goto waiting_with_character #waiting again
+        pop r5 off stack r3
+        r5 := 0
+        push r5 on stack r3
+        goto waiting #waiting again
 
 #################################################################
 # newline function
 #################################################################
 .section init 
     m[r0][jumptable + '\n'] := newline
-.section text
-    newline:
+.section text #val stack = r3
+    newline: #loop through val stack to print each item
         output "new line\n"
-        push r0 on stack r2
-        goto printd
-        goto waiting_with_character
+        push r0 on stack r2 #counter
+        pop stack r3 #pops state off call stack
+        if (r3 == endvalstack) goto waiting using r1
+        push r3 on stack r2
+        goto printd linking r1
+        pop r3 off stack r2
+        push r0 on stack r3 #indicates waiting
+        goto newline
 
+#################################################################
+# add function
+#################################################################
+.section init 
+    m[r0][jumptable + '+'] := add
+.section text
+    add:
+        output "add\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        pop r4 off stack r3 #value 2
+        r5 := r4 + r5
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# subtract function
+#################################################################
+.section init 
+    m[r0][jumptable + '-'] := sub
+.section text
+    sub:
+        output "sub\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        pop r4 off stack r3 #value 2
+        r5 := r4 - r5
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# multiply function
+#################################################################
+.section init 
+    m[r0][jumptable + '*'] := mul
+.section text
+    mul:
+        output "mul\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        pop r4 off stack r3 #value 2
+        r5 := r4 * r5
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# Division function
+#################################################################
+.section init 
+    m[r0][jumptable + '/'] := div
+.section text
+    div:
+        output "div\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        pop r4 off stack r3 #value 2
+        r5 := r4 / r5
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# or function
+#################################################################
+.section init 
+    m[r0][jumptable + '|'] := or
+.section text
+    or:
+        output "or\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        pop r4 off stack r3 #value 2
+        r5 := r4 | r5
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# and function
+#################################################################
+.section init 
+    m[r0][jumptable + '&'] := and
+.section text
+    and:
+        output "and\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        pop r4 off stack r3 #value 2
+        r5 := r4 & r5
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# change sign function
+#################################################################
+.section init 
+    m[r0][jumptable + 'c'] := changesign
+.section text
+    changesign:
+        output "changesign\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        r5 := -r5
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# swap function
+#################################################################
+.section init 
+    m[r0][jumptable + 's'] := swap
+.section text
+    swap:
+        output "swap\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        pop r4 off stack r3 #value 2
+        push r5 on stack r3
+        push r4 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# negation function
+#################################################################
+.section init 
+    m[r0][jumptable + '~'] := neg
+.section text
+    neg:
+        output "neg\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        r5 := ~r5
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# duplicate function
+#################################################################
+.section init 
+    m[r0][jumptable + 'd'] := dup
+.section text
+    dup:
+        output "dup\n"
+        pop stack r3 #waiting state
+        pop r5 off stack r3 #value 1
+        push r5 on stack r3
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# popoff function
+#################################################################
+.section init 
+    m[r0][jumptable + 'p'] := popoff
+.section text
+    popoff:
+        output "popoff\n"
+        pop stack r3 #waiting state
+        pop stack r3 #value 
+        push r0 on stack r3 #indicates waiting
+        goto waiting
+
+#################################################################
+# zerostack function -- figure this out i guess
+#################################################################
+.section init 
+    m[r0][jumptable + 'z'] := zerostack
+.section text
+    zerostack:
+        output "zerostack -- needs functionality\n"
+        pop stack r3 #waiting state
+        pop stack r3 #value 
+        push r0 on stack r3 #indicates waiting
+        goto waiting
 
 .section text
     entering:
         output "entering\n"
-        pop r5 off stack r3
-        output "r5: "
-        r5 := r5 + 48
-        output r5
-        r5 := r5 - 48
-        output "r4: "
-        output r4
+        pop r4 off stack r3
+        pop r1 off stack r3 
+        # output "first digit: "
+        # r1 := r1 + 48
+        # output r1
+        # r1 := r1 - 48
+        # output " next digit: "
+        # r4 := r4 + 48
+        # output r4
+        # r4 := r4 - 48
         
-        r5 := r5 * 10
-        r5 := r5 + r4
+        r1 := r1 * 10
+        r1 := r1 + r4
+        # r1 := r1 + 48
+        # output r1
+        # r1 := r1 - 48
+        push r1 on stack r3
+        r5 := 1 #entering
         push r5 on stack r3
         goto waiting
 
     waiting:
         output "waiting\n"
-        push r1 on stack r2
+        # push r1 on stack r2
         r4 := input() #12 2 +\n
+        # if r4 mod 10 == r4  goto print single digit
         goto waiting_with_character
         
 
@@ -104,6 +306,7 @@
         # r5 := m[r0][r5]
         # goto r5
     waiting_with_character:
+        #pop r5 off stack r3 #waiting or entering state
         output "waiting w/ character\n"
         #if (r5 == EOF) goto exit_prog
         output r4
@@ -117,7 +320,10 @@
 
     main:
         output "main\n"
+        r2 := endstack
+        r3 := endvalstack
         r0 := 0
+        push r0 on stack r3 #push waiting/entering on val stack
         pop r1 off stack r2
         push r1 on stack r2
         goto waiting linking r1
@@ -130,6 +336,19 @@
         # halt
         pop r1 off stack r2
         goto r1
+
+    # check1: #change sign, negate, dup, pop, newline  
+    #     #ensure somehow that there is a value on the value stack
+    #     push r4 on stack r2
+        
+        
+    #     pop r4 off stack r3
+    #     if (m[r0][jumptable + r4] != input_error)
+
+
+    #     pop r4 off stack r2
+    # check2: #add, sub, mult, div, or, and, swap
+    #     #ensure there are two values on the valuestack
 
     exit_prog:
         output "program exiting"

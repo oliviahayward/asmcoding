@@ -20,12 +20,16 @@
     
 .section text
     printd:  #assumes there is a number in the value stack
-        pop r5 off stack r2     #counter
+        
         push r1 on stack r2     #return address
         output '>'
         output '>'
         output '>'
         output ' '
+        pop r4 off stack r3
+        if (r4 <s r0) goto print_neg using r1
+        push r4 on stack r3
+        push r4 on stack r2
         goto print_loop
         
 
@@ -37,16 +41,19 @@
         # r5 is counter
         # r6 and r7 used as temps
 
-        pop r4 off stack r3         #grab value
-        r5 := r5 + 1                #increasing count
-        push r5 on stack r2
+        #pop r4 off stack r3         #grab value
+        #push r4 on stack r3
+        pop r4 off stack r2
         r5 := 10
         r1 := r4 mod r5             #getting the least significant digit
         if ( r1 == r4 ) goto base_case using r5 #if lsd = original value, then print
-        push r1 on stack r3         #pushing lsd onto value stack
+        push r1 on stack r2         #pushing lsd onto value stack
         r1 := r4 / 10               #getting number without last digit
-        push r1 on stack r3         #pushes number without last digit to value stack
-        pop r5 off stack r2         #get counter
+        push r1 on stack r2         #pushes number without last digit to value stack
+        #pop r5 off stack r2         #get counter
+        pop r5 off stack r2     #counter
+        r5 := r5 + 1                #increasing count
+        push r5 on stack r2
         goto print_loop             #restarts loop
 
 
@@ -58,7 +65,7 @@
         output r4                       #print msd
         r4 := r4 - 48                    
         r5 := r5 - 1                    #decrement counter
-        pop r4 off stack r3 
+        pop r4 off stack r2 
         push r5 on stack r2
         goto base_case 
 
@@ -66,4 +73,12 @@
     exit_print:
         output '\n'
         pop r1 off stack r2
+        push r4 on stack r2
+        r0 := 0
         goto r1
+    
+    print_neg:
+        output '-'
+        r4 := -r4
+        push r4 on stack r2
+        goto print_loop
