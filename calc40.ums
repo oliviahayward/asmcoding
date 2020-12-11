@@ -11,41 +11,38 @@
     jumptable:
         .space 256
     init_table:
+        push r1 on stack r2
         r5 := jumptable
         r4 := r5 + 256
-        output "jt initialized\n"
         goto init_table_loop
 
     init_table_loop:
-        output "init_table_loop\n"
-        r5 := r5 + 1
-        #if (r4 == r5) goto main using r0 ######## this is the segfault issue
-        output "r4 == r5 passed\n"
+        r5 := r5 + 1        
         m[r0][r5] := input_error
-        goto main
-        goto init_table_loop
+        if (r4 >s r5) goto init_table_loop using r1 ######## this is the segfault issue
 
 #################################################################
 # number function
 #################################################################
 .section init 
-    m[r0][jumptable + '0'] := number
-    m[r0][jumptable + '1'] := number
-    m[r0][jumptable + '2'] := number
-    m[r0][jumptable + '3'] := number
-    m[r0][jumptable + '4'] := number
-    m[r0][jumptable + '5'] := number
-    m[r0][jumptable + '6'] := number
-    m[r0][jumptable + '7'] := number
-    m[r0][jumptable + '8'] := number
-    m[r0][jumptable + '9'] := number
+    init_num_table:
+        m[r0][jumptable + '0'] := number
+        m[r0][jumptable + '1'] := number
+        m[r0][jumptable + '2'] := number
+        m[r0][jumptable + '3'] := number
+        m[r0][jumptable + '4'] := number
+        m[r0][jumptable + '5'] := number
+        m[r0][jumptable + '6'] := number
+        m[r0][jumptable + '7'] := number
+        m[r0][jumptable + '8'] := number
+        m[r0][jumptable + '9'] := number
 .section text
     number:
-        output 'q'
+        output 'r'
         push r1 on stack r2 #return address
-        push r4 on stack r2 #nonvolatiles
+        push r4 on stack r3 #nonvolatiles
         push r5 on stack r2 
-        goto waiting
+        goto entering
 
 #################################################################
 # space function
@@ -55,7 +52,7 @@
 .section text
     space: 
         output "space\n"
-        goto waiting #waiting again
+        goto waiting_with_character #waiting again
 
 #################################################################
 # newline function
@@ -65,18 +62,26 @@
 .section text
     newline:
         output "new line\n"
+        push r0 on stack r2
         goto printd
+        goto waiting_with_character
 
 
 .section text
+    entering:
+        output "entering\n"
+        pop r5 off stack r3
+        r5 := r5 * 10
+        r5 := r5 + r4
+        push r4 on stack r3
+        goto waiting
+
     waiting:
         output "waiting\n"
         push r1 on stack r2
         r4 := input() #12 2 +\n
-        output r4
-        r5 := jumptable + r4
-        r5 := m[r0][r5]
-        goto r5 #linking r1
+        goto waiting_with_character
+        
 
         # while (stack is not empty)
         #     need to get last character for r4 on stack
@@ -90,6 +95,14 @@
         # r5 := jumptable + r4
         # r5 := m[r0][r5]
         # goto r5
+    waiting_with_character:
+        output "waiting w/ character\n"
+        #if (r5 == EOF) goto exit_prog
+        output r4
+        r5 := jumptable + r4
+        r5 := m[r0][r5]
+        goto r5 #linking r1
+    
     input_error:
         output 'q'
         halt
@@ -97,7 +110,7 @@
     main:
         output "main\n"
     	r0 := 0
-        #pop r1 off stack r2
+        pop r1 off stack r2
         push r1 on stack r2
         goto waiting linking r1
 
@@ -109,3 +122,7 @@
         # halt
         pop r1 off stack r2
         goto r1
+
+    exit_prog:
+        output "program exiting"
+        halt
