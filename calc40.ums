@@ -10,17 +10,20 @@
     .temps r6, r7
     jumptable:
         .space 256
-
     init_table:
         r5 := jumptable
-        r4 := jumptable + 256
-        goto init_table_loop
-    init_table_loop:
-        m[r0][r5] := input_error
-        r5 := r5 + 1
-        if (r4 == r5) goto main using r1
+        r4 := r5 + 256
+        output "jt initialized\n"
         goto init_table_loop
 
+    init_table_loop:
+        output "init_table_loop\n"
+        r5 := r5 + 1
+        #if (r4 == r5) goto main using r0 ######## this is the segfault issue
+        output "r4 == r5 passed\n"
+        m[r0][r5] := input_error
+        goto main
+        goto init_table_loop
 
 #################################################################
 # number function
@@ -42,7 +45,7 @@
         push r1 on stack r2 #return address
         push r4 on stack r2 #nonvolatiles
         push r5 on stack r2 
-        goto waiting #waiting again
+        goto waiting
 
 #################################################################
 # space function
@@ -51,7 +54,7 @@
     m[r0][jumptable + ' '] := space
 .section text
     space: 
-        output 'e'
+        output "space\n"
         goto waiting #waiting again
 
 #################################################################
@@ -60,30 +63,25 @@
 .section init 
     m[r0][jumptable + '\n'] := newline
 .section text
-    newline: 
-        output 'a'
+    newline:
+        output "new line\n"
         goto printd
 
 
 .section text
-    
-
     waiting:
+        output "waiting\n"
         push r1 on stack r2
         r4 := input() #12 2 +\n
+        output r4
         r5 := jumptable + r4
         r5 := m[r0][r5]
-        goto r5 linking r1
+        goto r5 #linking r1
 
         # while (stack is not empty)
         #     need to get last character for r4 on stack
         #     push r4 / 10 on stack r3
 
-        
-        
-        
-        
-        
         # push r1 on stack r2 
         # r4 := input() 		#user input
         # output r4
@@ -97,21 +95,17 @@
         halt
 
     main:
+        output "main\n"
+    	r0 := 0
+        #pop r1 off stack r2
         push r1 on stack r2
         goto waiting linking r1
-        pop r1 off stack r2
-        goto r1
-        
+
         # r5 := 0				#counter
         # push r5 on stack r2
         # goto printd linking r1
         # pop r1 off stack r2
         # goto r1
         # halt
-
-    #entering:
-
-
-   
-
-
+        pop r1 off stack r2
+        goto r1

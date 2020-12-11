@@ -1,7 +1,7 @@
 .section init
     .zero r0
     .temps r6, r7
-.section text
-    callmain:
-        goto main linking r1
-        halt
+.section init
+	output "callmain\n"
+	goto main linking r1
+	halt
