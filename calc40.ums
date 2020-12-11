@@ -40,6 +40,7 @@
     number:
         output 'r'
         push r1 on stack r2 #return address
+        r4 := r4 - 48
         push r4 on stack r3 #nonvolatiles
         push r5 on stack r2 
         goto entering
@@ -71,9 +72,16 @@
     entering:
         output "entering\n"
         pop r5 off stack r3
+        output "r5: "
+        r5 := r5 + 48
+        output r5
+        r5 := r5 - 48
+        output "r4: "
+        output r4
+        
         r5 := r5 * 10
         r5 := r5 + r4
-        push r4 on stack r3
+        push r5 on stack r3
         goto waiting
 
     waiting:
@@ -88,7 +96,7 @@
         #     push r4 / 10 on stack r3
 
         # push r1 on stack r2 
-        # r4 := input() 		#user input
+        # r4 := input()         #user input
         # output r4
         # r5 := r4 - 48
         # push r5 on stack r3
@@ -109,12 +117,12 @@
 
     main:
         output "main\n"
-    	r0 := 0
+        r0 := 0
         pop r1 off stack r2
         push r1 on stack r2
         goto waiting linking r1
 
-        # r5 := 0				#counter
+        # r5 := 0               #counter
         # push r5 on stack r2
         # goto printd linking r1
         # pop r1 off stack r2
