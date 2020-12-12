@@ -50,14 +50,27 @@
     ############################################################################
     number:
         output 'r'
-        r3 := m[r0][r2 + 1] #get val stack
+        r5 := endvalstack - r3
+        r5 := r5 + 48
+        output r5
+        r5 := r5 - 48
+
         pop r5 off stack r3 #entering or waiting state = r5
+        r5 := r5 + 48
+        output r5
+        r5 := r5 - 48
+        
         push r1 on stack r2 #return address to
+        
         r4 := r4 - 48       #convert to decimal
+        
         push r4 on stack r3 #input
+        
         if (r5 == 1) goto entering using r4
         r5 := 1
+        
         push r5 on stack r3 #setting entering state
+        output 'r'
         goto waiting
 
 #################################################################
@@ -101,24 +114,37 @@
     ############################################################################
     newline: #loop through val stack to print each item
         output "new line\n"
-        r3 := m[r0][r2 + 1] #get valstack
-        r5 := m[r0][r3]
-        r5 := r5 + 48
-        output r5
-        halt
-        
+        # r3 := m[r0][r2]
+        # r4 := m[r0][r3 + 1]
+        # r4 := r4 + 48
+        # output r4
+        # r4 := r4 - 48
+        pop stack r3 #pops state off value stack
+        r4 := r3
+        # r5 := m[r0][r3] #getting first value on val stack
         goto newline_loop
 
     newline_loop:
         output "newline_loop"
-        r5 := m[r0][r3] #value
+
+        if (r4 == endvalstack) goto post_print using r1
+        r5 := m[r0][r4] #value
+        # r5 := r5 + 48
+        # output r5
+        # r5 := r5 - 48
         push r0 on stack r2 #counter
-        pop stack r3 #pops state off call stack
-        if (r3 == endvalstack) goto waiting using r1
-        r3 := r3 + 1
+        # pop stack r4 #pops state off call stack
+
         goto printd linking r1
-        push r0 on stack r3 #indicates waiting
+        r4 := r4 + 1
+        
+        # push r0 on stack r3 #indicates waiting
         goto newline_loop
+
+    post_print:
+        push r0 on stack r3
+        goto waiting
+
 
 #################################################################
 # add function
@@ -341,9 +367,21 @@
     entering:
         output "entering\n"
         pop r4 off stack r3 #last digit input
+        # r4 := r4 + 48
+        # output "should be 2: "
+        # output r4
+        # r4 := r4 - 48
         pop r1 off stack r3 #other digit
+        # r1 := r1 + 48
+        # output "should be 1: "
+        # output r1
+        # r1 := r1 - 48
         r1 := r1 * 10
         r1 := r1 + r4
+        # output "ascii value: "
+        # r1 := r1 + 48
+        # output r1
+        # r1 := r1 - 48
         push r1 on stack r3
         r5 := 1 #entering
         push r5 on stack r3
@@ -361,6 +399,13 @@
     ############################################################################
     waiting:
         output "waiting\n"
+        pop r1 off stack r2     # add to main
+        pop r4 off stack r2     #add to callmain
+        pop stack r2    #old valuestack
+        push r3 on stack r2 #push value stack on call stack (m[0][r2 + 3])
+        # if ( r3 == m[r0][r2]) goto exit_prog using r5
+        push r4 on stack r2
+        push r1 on stack r2
         # push r1 on stack r2
         r4 := input() #12 2 +\n
         # if r4 mod 10 == r4  goto print single digit
@@ -381,10 +426,16 @@
         #pop r5 off stack r3 #waiting or entering state
         output "waiting w/ character\n"
         #if (r5 == EOF) goto exit_prog
-        output r4
+        output r4 #input
         r5 := jumptable + r4
-        r5 := m[r0][r5]
-        goto r5 #linking r1
+        r5 := m[r0][r5] #jump
+        push r1 on stack r2
+        goto r5 linking r1
+        pop r1 off stack r2 #ret add to main
+        pop stack r2 # old val stack
+        push r3 on stack r2 # new val stack
+        push r1 on stack r2
+        goto waiting
     
     input_error:
         output 'q'
@@ -404,8 +455,8 @@
         output "main\n"
         r0 := 0
         r3 := endvalstack
-        push r3 on stack r2 #push value stack on call stack (m[0][r2 + 1])
         push r1 on stack r2 #return address
+        # r3 := m[r0][r2 + 1]
         push r0 on stack r3 
         goto waiting linking r1
 

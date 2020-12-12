@@ -56,14 +56,20 @@
     #           note: r4 = msd, r5 = counter
     ############################################################################
     print_loop:
+        output "printloop\n"
         pop r4 off stack r2         #values
+        # r4 := r4 + 48
+        # output r4
+        # output "test"
+        # r4 := r4 - 48
         r3 := 10
         r1 := r4 mod r3             #getting the least significant digit
+        r5 := r5 + 1                #increasing count
         if ( r1 == r4 ) goto base_case using r3 #if lsd = original value, then print
         push r1 on stack r2         #pushing lsd onto value stack
         r1 := r4 / 10               #getting number without last digit
         push r1 on stack r2         #pushes number without last digit to value stack
-        r5 := r5 + 1                #increasing count
+        
         goto print_loop             #restarts loop
 
     ############################################################################
@@ -78,6 +84,7 @@
     #           note: r4 = lsd, r5 = counter
     ############################################################################
     base_case:
+        output "base"
         if (r5 == r0) goto exit_print using r1
         r4 := r4 + 48                   
         output r4                       #print msd
@@ -100,6 +107,7 @@
         output '\n'
         pop r1 off stack r2
         r0 := 0
+        # push r0 on stack r3 #push waiting on value stack
         goto r1
     
     print_neg:
