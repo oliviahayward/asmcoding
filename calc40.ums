@@ -49,19 +49,12 @@
     #           note: r5 = entering or waiting, r3 = val stack
     ############################################################################
     number:
-        output 'r'
-
-        pop r5 off stack r3 #entering or waiting state = r5
-        
+        pop r5 off stack r3 #entering or waiting state = r5   
         r4 := r4 - 48       #convert to decimal
-        
         push r4 on stack r3 #input
-        
         if (r5 == 1) goto entering using r1
         r5 := 1
-        
         push r5 on stack r3 #setting entering state
-        output 'b'
         goto waiting
 
 #################################################################
@@ -81,7 +74,6 @@
     #           note: r4 = input, r5 = jumplocation
     ############################################################################
     space: 
-        output "space\n"
         pop r5 off stack r3 #get state
         r5 := 0 #set to waiting
         push r5 on stack r3 #push to val stack
@@ -104,47 +96,43 @@
     #           note: r4 = input, r5 = value
     ############################################################################
     newline: #loop through val stack to print each item
-        #output "new line\n"
-
-        
-
         pop stack r3 #pops state off value stack
 
+        push r1 on stack r2
+        push r4 on stack r2
+        r4 := endvalstack - r3
+        if (r4 == r0) goto newline_noinput using r1
+        pop r4 off stack r2
+        pop r1 off stack r2
+
         r1 := m[r0][r3]
-        r1 := r1 + 48
-        output r1
-        r1 := r1 - 48
         
         r4 := r3 #saves address of value stack in r3
         goto newline_loop
 
     newline_loop:
-        #output "newline_loop"
         if (r4 == endvalstack) goto post_print using r1
         r5 := m[r0][r4] #value
-        # r5 := r5 + 48
-        # output r5
-        # r5 := r5 - 48
         push r4 on stack r2
         push r0 on stack r2 #counter
         goto printd linking r1
-        #output "after print"
-        #pop r4 off stack r2
         r4 := r4 + 1 #increase address to point to next value   
         goto newline_loop
 
     post_print:
-        #output "postprint"
-        pop stack r2 #some number?
+        pop stack r2
         r3 := m[r0][r2]
         pop stack r3
         r4 := m[r0][r3]
-        r4:= r4 + 48
-        output r4
-        r4 := r4 - 48
-        output "test"
         push r0 on stack r3
         goto waiting
+
+    newline_noinput:
+        pop r4 off stack r2
+        pop r1 off stack r2
+        push r0 on stack r3
+        goto waiting
+
 
 
 #################################################################
@@ -164,7 +152,9 @@
     #           note: r4 = input, r5 = jumplocation
     ############################################################################
     add:
-        output "add\n"
+        push r1 on stack r2
+        goto check2 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -181,7 +171,9 @@
     m[r0][jumptable + '-'] := sub
 .section text
     sub:
-        output "sub\n"
+        push r1 on stack r2
+        goto check2 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -198,7 +190,9 @@
     m[r0][jumptable + '*'] := mul
 .section text
     mul:
-        output "mul\n"
+        push r1 on stack r2
+        goto check2 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -215,14 +209,59 @@
     m[r0][jumptable + '/'] := div
 .section text
     div:
-        output "div\n"
+        push r1 on stack r2
+        goto check2 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
         pop r4 off stack r3 #value 2
+        push r1 on stack r2
+
+        if (r5 == r0) goto divzero using r1
+        if (r5 <s r0) goto first_negative using r1
+        if (r4 <s r0) goto second_negative using r1
+
         r5 := r4 / r5
         push r5 on stack r3
         push r0 on stack r3 #indicates waiting
+        pop r1 off stack r2
+        goto waiting
+
+    divzero:
+        output "Division by zero\n"
+        push r4 on stack r3
+        push r5 on stack r3
+        push r0 on stack r3 #indicates waiting
+        pop r1 off stack r2
+        goto waiting
+
+    first_negative:
+        if (r4 <s 0) goto bothnegative using r1
+        r5 := -r5
+        r5 := r4 / r5
+        r5 := -r5
+        push r5 on stack r3
+        push r0 on stack r3
+        pop r1 off stack r2
+        goto waiting
+
+    second_negative:
+        r4 := -r4
+        r4 := r5 / r4
+        r4 := -r4
+        push r4 on stack r3
+        push r0 on stack r3
+        pop r1 off stack r2
+        goto waiting
+
+    bothnegative:
+        r4 := -r4
+        r5 := -r5
+        r5 := r4 / r5
+        push r5 on stack r3
+        push r0 on stack r3
+        pop r1 off stack r2
         goto waiting
 
 #################################################################
@@ -232,7 +271,9 @@
     m[r0][jumptable + '|'] := or
 .section text
     or:
-        output "or\n"
+        push r1 on stack r2
+        goto check2 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -249,7 +290,9 @@
     m[r0][jumptable + '&'] := and
 .section text
     and:
-        output "and\n"
+        push r1 on stack r2
+        goto check2 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -266,7 +309,9 @@
     m[r0][jumptable + 'c'] := changesign
 .section text
     changesign:
-        output "changesign\n"
+        push r1 on stack r2
+        goto check1 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -282,7 +327,9 @@
     m[r0][jumptable + 's'] := swap
 .section text
     swap:
-        output "swap\n"
+        push r1 on stack r2
+        goto check2 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -299,7 +346,9 @@
     m[r0][jumptable + '~'] := neg
 .section text
     neg:
-        output "neg\n"
+        push r1 on stack r2
+        goto check1 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -315,7 +364,9 @@
     m[r0][jumptable + 'd'] := dup
 .section text
     dup:
-        output "dup\n"
+        push r1 on stack r2
+        goto check1 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop r5 off stack r3 #value 1
@@ -331,7 +382,9 @@
     m[r0][jumptable + 'p'] := popoff
 .section text
     popoff:
-        output "popoff\n"
+        push r1 on stack r2
+        goto check1 linking r1
+        pop r1 off stack r2
         r3 := m[r0][r2 + 1]
         pop stack r3 #waiting state
         pop stack r3 #value 
@@ -345,12 +398,22 @@
     m[r0][jumptable + 'z'] := zerostack
 .section text
     zerostack:
-        output "zerostack -- needs functionality\n"
-        r3 := m[r0][r2 + 1]
+        push r1 on stack r2
+        push r4 on stack r2
         pop stack r3 #waiting state
-        pop stack r3 #value 
+        r4 := endvalstack - r3
+        goto zerostack_loop linking r1
+        pop r4 off stack r2
+        pop r1 off stack r2
         push r0 on stack r3 #indicates waiting
         goto waiting
+    zerostack_loop:
+        if (r4 == 0) goto r1
+        pop stack r3
+        r4 := r4 - 1
+        goto zerostack_loop
+
+
 
 .section text
     ############################################################################
@@ -366,23 +429,10 @@
     #           note: r4 = first digit input, r1 = entering
     ############################################################################
     entering:
-        output "entering\n"
         pop r4 off stack r3 #last digit input
-        # r4 := r4 + 48
-        # output "should be 2: "
-        # output r4
-        # r4 := r4 - 48
         pop r1 off stack r3 #other digit
-        # r1 := r1 + 48
-        # output "should be 1: "
-        # output r1
-        # r1 := r1 - 48
         r1 := r1 * 10
         r1 := r1 + r4
-        # output "ascii value: "
-        # r1 := r1 + 48
-        # output r1
-        # r1 := r1 - 48
         push r1 on stack r3
         r5 := 1 #entering
         push r5 on stack r3
@@ -399,17 +449,11 @@
     #           note: r4 = input
     ############################################################################
     waiting:
-        output "waiting\n"
         pop r1 off stack r2     # add to main
-        # pop r4 off stack r2     #add to callmain
         pop stack r2    #old valuestack
         push r3 on stack r2 #push value stack on call stack (m[0][r2 + 3])
-        # if ( r3 == m[r0][r2]) goto exit_prog using r5
-        # push r4 on stack r2
         push r1 on stack r2
-        # push r1 on stack r2
-        r4 := input() #12 2 +\n
-        # if r4 mod 10 == r4  goto print single digit
+        r4 := input() 
         goto waiting_with_character
     
     
@@ -424,10 +468,6 @@
     #           note: r4 = input, r5 = jumplocation
     ############################################################################
     waiting_with_character:
-        #pop r5 off stack r3 #waiting or entering state
-        #output "waiting w/ character\n"
-        #if (r5 == EOF) goto exit_prog
-        output r4 #input
         r5 := jumptable + r4
         r5 := m[r0][r5] #jump
         goto r5 linking r1
@@ -438,8 +478,10 @@
         goto waiting
     
     input_error:
-        output 'q'
-        halt
+        output "Unknown character '"
+        output r4
+        output "'\n"
+        goto waiting
 
     ############################################################################
     # input
@@ -452,12 +494,10 @@
     #           note: 
     ############################################################################
     main:
-        output "main\n"
         r0 := 0
         r3 := endvalstack
         push r3 on stack r2
         push r1 on stack r2 #return address
-        # r3 := m[r0][r2 + 1]
         push r0 on stack r3 
         goto waiting linking r1
         #program goes to exit program on its own.
@@ -465,18 +505,41 @@
 
         goto r1
 
-    # check1: #change sign, negate, dup, pop, newline  
-    #     #ensure somehow that there is a value on the value stack
-    #     push r4 on stack r2
-        
-        
-    #     pop r4 off stack r3
-    #     if (m[r0][jumptable + r4] != input_error)
+    check1:
+        push r1 on stack r2
+        push r4 on stack r2
+        push r5 on stack r2
+        r4 := endvalstack - r3
+        if (r4 <s 2) goto arg_error1 using r5
+        pop r5 off stack r2
+        pop r4 off stack r2
+        pop r1 off stack r2
+        goto r1
 
+    check2:
+        push r1 on stack r2
+        push r4 on stack r2
+        push r5 on stack r2
+        r4 := endvalstack - r3
+        if (r4 <s 3) goto arg_error2 using r5
+        pop r5 off stack r2
+        pop r4 off stack r2
+        pop r1 off stack r2
+        goto r1
 
-    #     pop r4 off stack r2
-    # check2: #add, sub, mult, div, or, and, swap
-    #     #ensure there are two values on the valuestack
+    arg_error1:
+        output "Stack underflow---expected at least 1 element\n"
+        pop r5 off stack r2
+        pop r4 off stack r2
+        pop r1 off stack r2
+        goto waiting
+
+    arg_error2:
+        output "Stack underflow---expected at least 2 elements\n"
+        pop r5 off stack r2
+        pop r4 off stack r2
+        pop r1 off stack r2
+        goto waiting
 
     exit_prog:
         output "program exiting"

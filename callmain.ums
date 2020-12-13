@@ -2,7 +2,5 @@
     .zero r0
     .temps r6, r7
 .section init
-	output "callmain\n"
 	goto main linking r1
-	output "callmain again\n"
 	halt	
