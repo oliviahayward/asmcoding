@@ -30,17 +30,23 @@
     #           note: r4 = value, r5 = counter
     ############################################################################
     printd:  #assumes there is a number in the value stack
-        output "printd"
+        #output "printd"
         r4 := r5
-        #pop r4 off stack r3     #value
         pop r5 off stack r2     #counter
-        push r1 on stack r2     #return address
+        # r4 := r4 + 48
+        # output r4
+        # r4 := r4 - 48
+        #pop r4 off stack r3     #value
+        
+        
+        push r1 on stack r2     #return address to printd
         output '>'
         output '>'
         output '>'
         output ' '
         if (r4 <s r0) goto print_neg using r1
         push r4 on stack r3     #value back on value stack
+        push r3 on stack r2
         push r4 on stack r2     #push value on call stack
         goto print_loop
         
@@ -56,7 +62,7 @@
     #           note: r4 = msd, r5 = counter
     ############################################################################
     print_loop:
-        output "printloop\n"
+        #output "printloop\n"
         pop r4 off stack r2         #values
         # r4 := r4 + 48
         # output r4
@@ -84,13 +90,18 @@
     #           note: r4 = lsd, r5 = counter
     ############################################################################
     base_case:
-        output "base"
+        #output "base"
+        push r4 on stack r2
+        # r5 := r5 + 48
+        # output r5
+        # r5 := r5 - 48
         if (r5 == r0) goto exit_print using r1
         r4 := r4 + 48                   
         output r4                       #print msd
         r4 := r4 - 48                    
         r5 := r5 - 1                    #decrement counter
         pop r4 off stack r2 
+        pop r4 off stack r2
         goto base_case 
 
     ############################################################################
@@ -104,8 +115,18 @@
     #           note: r4 = lsd, r5 = counter
     ############################################################################
     exit_print:
+        #output "exit print"
         output '\n'
-        pop r1 off stack r2
+        
+        pop r3 off stack r2 #value stack
+        pop r1 off stack r2 #printd
+        pop r4 off stack r2    #valstack address
+        # pop r0 off stack r2 #callmain address
+        pop stack r2 #old valstack
+        push r3 on stack r2     #add new valstack as first thing on callstack
+        # push r0 on stack r2
+        # pop r4 off stack r2 
+        # if (r1 == waiting) goto print_neg using r5
         r0 := 0
         # push r0 on stack r3 #push waiting on value stack
         goto r1
