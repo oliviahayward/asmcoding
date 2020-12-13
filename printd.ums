@@ -49,6 +49,8 @@
         
         push r1 on stack r2     #return address to newline_loop
         output ">>> "
+        r1 := 0x80000000
+        if (r4 == r1) goto print_neg_test using r1
         if (r4 <s r0) goto print_neg using r1
         push r4 on stack r3     #value back on value stack
         push r3 on stack r2
@@ -194,6 +196,14 @@
         #    the number
         # r6, r7 are temps
 
+        output '-'
+        r4 := -r4
+        push r4 on stack r3
+        push r3 on stack r2
+        push r4 on stack r2
+        goto print_loop
+
+    print_neg_test:
         output '-'
         r4 := -r4
         push r4 on stack r3
