@@ -14,10 +14,76 @@ We did not differ from the standard calling conventions.
 We represent the value stack as stack of 10,000 elements, stored as the first
 thing on the call stack.
 
-comments for each section:
+Design: 
+    We have a control flow in calc40 that can be in states waiting, or
+    entering. The state is held at the top of the value stack. We implemented a
+    jump table for our calculators functions (reading a digit, adding,
+    subtracting, etc...). However our printing is done in our printd file.
+    The calculator reads a newline, sets up for printd and then transfers the
+    control over to printd.
 
-We spent 893759847628 hours analyzing the assignment
-We spent 851643856432706578293467 hours writing the assembly code
-We spent 9564783926578463287964378265784365789243657894362758643782956478923657
-hours debugging our calculator
+Comments for each section:
+    calc40.ums
+        init_table: initiates the jumptable and calls init_table_loop
+        init_table_loop: loops through the jumptable and sets all values to 
+                            input_error
+        number: stores the inputted digit on the value stack and calls either
+                entering or waiting based on the state
+        space: resets the state to waiting and goes back to the waiting function
+        newline: loops through the value stack to get each of the values
+            to be printed. It then calls newline_loop to push the value onto
+            the call stack and calls printd. It then increments the counter,
+            which is counting the number of values left on the value stack.
+        add: checks that there are enough values on the stack, then adds the
+            previous 2 values on the stack together
+        sub: checks that there are enough values on the stack, then
+            subtracts the most recent value from the second value.
+        mul: checks that there are enough values on the stack, then
+            multiplies the 2 most recents numbers on the stack together
+        div: checks that there are enough values on the stack, then
+            divides the second value on the stack by the first. If there are any
+            special cases, it calls the appropriate function
+        or: checks that there are enough values on the stack, then does a
+            bitwise or on the two most recent values on the stack
+        and: checks that there are enoguh values on the stack, then does a 
+            bitwise and on the two most recent values on the stack
+        changesign: checks that there are enough values on the stack, then
+            changes the sign of the number from positive to negative
+        swap: checks that there are enough values on the stack, then swaps
+            the first value on the stack with the second value
+        neg: checks that there are enough values on the stack, then
+            replaces the first value on the stack with its opposite
+        dup: checks that there are enough values on the stack, then
+            pushes the value on the top of the stack to the value stack again
+        popoff: checks that there are enough values on the stack, then it 
+            pops the top value off of the stack
+        zerostack: finds out how many values are on the value stack, then
+            loops through to pop them all off
+        entering: grabs the most recent value off the value stack and multiplies
+            it by 10. Then it adds that number to the digit currently held in r4
+            and stores that result onto the value stack, then goes back to 
+            waiting.
+        waiting: pops the old value stack off of the call stack and pushes the 
+            updated valuestack onto the call stack. Then it grabs the next
+            character input and goes to waiting_with_character
+        waiting_with_character: checks for EOF, then goes to the character's 
+            spot in the jumptable. Then it pops off the old value stack and
+            pushes the updated one again and goes back to waiting.
+
+    printd.ums
+        printd: Contains all of the necessary functions to print a
+            value on the value stack. Loops through the value, storing each
+            digit on the callstack and then printing it out digit-by-digit in
+            base_case.
+
+    urt0.ums
+        Initializes our valuestack to store 50,000 elements and call stack to
+        store 100,000 elements
+    
+    callmain.ums
+        Calls our main function in calc40.ums
+
+We spent 5 hours analyzing the assignment
+We spent 7.5 hours writing the assembly code
+We spent 10 hours debugging our calculator
 

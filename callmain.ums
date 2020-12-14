@@ -1,3 +1,7 @@
+# callmain.ums
+# sets temp registers and calls our main function
+# Olivia Hayward and Will McLeish
+
 .section init
     .zero r0
     .temps r6, r7

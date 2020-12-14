@@ -1,3 +1,7 @@
+# urt0.ums
+# initializes our stacks for our RPN calculator
+# Olivia Hayward and Will McLeish
+
 # Calling Convention
 # r0 is 0
 # r1 is the return-address and result register 

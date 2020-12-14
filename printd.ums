@@ -1,3 +1,7 @@
+# printd.ums
+# prints all the values on a valuestack from our RPN calculator
+# Olivia Hayward and Will McLeish
+
 # Calling Convention
 # r0 is 0
 # r1 is the return-address and result register 
@@ -12,7 +16,7 @@
     .temps r6, r7
     
 .section text
-    ############################################################################
+    ###########################################################################
     # printd:
     #    Prints the initial ">>>" and determines whether the value to print is
     #    positive or negative then calls the appropriate function. It also
@@ -26,7 +30,7 @@
     #     call stack: val stack, return address to main, return add, value(s)
     #      val stack: value(s)
     #           note: r4 = value, r5 = counter
-    ############################################################################
+    ###########################################################################
     printd:
         # r0 holds the value 0
         # r1 holds the return address to newline_loop
@@ -36,17 +40,8 @@
         # r5 holds the counter, which keeps track of how many digits are in
         #    the number
         # r6, r7 are temps
-
-        #assumes there is a number in the value stack
-        #output "printd"
         r4 := r5
         pop r5 off stack r2     #counter
-        # r4 := r4 + 48
-        # output r4
-        # r4 := r4 - 48
-        #pop r4 off stack r3     #value
-        
-        
         push r1 on stack r2     #return address to newline_loop
         output ">>> "
         r1 := 0x80000000
@@ -57,11 +52,11 @@
         push r4 on stack r2     #push value on call stack
         goto print_loop
         
-    ############################################################################
+    ###########################################################################
     # print_loop:
     #     Finds the least significant digit of a value, stores that in the call
     #     stack, then divides the value by 10 and calls itself with that new
-    #     value. When it finds the most significant digit, it goes to base_case.
+    #     value. When it finds the most significant digit, it goes to base_case
     #   input
     #     call stack: val stack, return address to main, return add, value(s)
     #      val stack: value(s)
@@ -71,7 +66,7 @@
     #                 digit, mid digit, most SD
     #      val stack: value(s)
     #           note: r4 = msd, r5 = counter
-    ############################################################################
+    ###########################################################################
     print_loop:
         # r0 holds the value 0
         # r1 holds the least significant digit initially, then holds the 
@@ -83,24 +78,20 @@
         # r5 holds the counter, which keeps track of how many digits are in the
         #    value
         # r6, r7 are temps
-
-        #output "printloop\n"
         pop r4 off stack r2         #values
-        # r4 := r4 + 48
-        # output r4
-        # output "test"
-        # r4 := r4 - 48
         r3 := 10
         r1 := r4 mod r3             #getting the least significant digit
         r5 := r5 + 1                #increasing count
-        if ( r1 == r4 ) goto base_case using r3 #if lsd = original value, then print
+        if ( r1 == r4 ) goto base_case using r3 #if lsd = original value, then
+                                                # print
         push r1 on stack r2         #pushing lsd onto value stack
         r1 := r4 / 10               #getting number without last digit
-        push r1 on stack r2         #pushes number without last digit to value stack
+        push r1 on stack r2         #pushes number without last digit to value
+                                    # stack
         
         goto print_loop             #restarts loop
 
-    ############################################################################
+    ###########################################################################
     # base_case:
     #   Prints out the first digit on the call stack which is the
     #   most significant digit. It loops through, popping off digits
@@ -115,7 +106,7 @@
     #     call stack: val stack, return address to main, return add
     #      val stack: value(s)
     #           note: r4 = lsd, r5 = counter
-    ############################################################################
+    ###########################################################################
     base_case:
         # r0 holds the value 0
         # r1 is used to go to exit_print
@@ -126,11 +117,7 @@
         #    value
         # r6, r7 are temps
 
-        #output "base"
         push r4 on stack r2
-        # r5 := r5 + 48
-        # output r5
-        # r5 := r5 - 48
         if (r5 == r0) goto exit_print using r1
         r4 := r4 + 48                   
         output r4                       #print msd
@@ -140,7 +127,7 @@
         pop r4 off stack r2
         goto base_case 
 
-    ############################################################################
+    ###########################################################################
     # exit_print:
     #   Prints a new line, updates value stack with new values,
     #   returns to newline_loop
@@ -152,7 +139,7 @@
     #       call stack: val stack, return address to main
     #        val stack: value(s)
     #             note: r4 = lsd, r5 = counter
-    ############################################################################
+    ###########################################################################
     exit_print:
         # r0 is reset to 0
         # r1 holds the return address to newline_loop
@@ -162,29 +149,21 @@
         #    value stack is located
         # r5 holds our counter for the current value
         # r6, r7 are temps
-
-        #output "exit print"
         output '\n'
-        
         pop r3 off stack r2 #value stack
         pop r1 off stack r2 #printd
         pop r4 off stack r2    #valstack address
-        # pop r0 off stack r2 #callmain address
         pop stack r2 #old valstack
         push r3 on stack r2     #add new valstack as first thing on callstack
-        # push r0 on stack r2
-        # pop r4 off stack r2 
-        # if (r1 == waiting) goto print_neg using r5
         r0 := 0
-        # push r0 on stack r3 #push waiting on value stack
         goto r1
     
 
-    ############################################################################
+    ###########################################################################
     # print_neg:
     #   Prints a negative number stored in r4, goes to print_loop.
     #   
-    ############################################################################
+    ###########################################################################
 
     print_neg:
         # r0 holds the value 0

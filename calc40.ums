@@ -1,3 +1,9 @@
+# calc40.ums
+# runs an RPN calculator using user input
+# Olivia Hayward and Will McLeish
+
+
+# note: all sections in calc40.ums follow this calling convention
 # Calling Convention
 # r0 is 0
 # r1 is the return-address and result register
@@ -105,16 +111,13 @@
 .section text #val stack = r3
     newline:
         pop stack r3 #pops state off value stack
-
         push r1 on stack r2
         push r4 on stack r2
         r4 := endvalstack - r3
         if (r4 == r0) goto newline_noinput using r1
         pop r4 off stack r2
         pop r1 off stack r2
-
         r1 := m[r0][r3]
-        
         r4 := r3 #saves address of value stack in r3
         goto newline_loop
 
@@ -484,7 +487,7 @@
         goto waiting
 
 #################################################################
-# popoff function: checks that there are enough values on the stack, then it 
+# popoff function: checks that there are enough values on the stack, then it
 #       pops the top value off of the stack
 # input
 #     call stack: val stack, return address to main
@@ -535,7 +538,7 @@
         push r0 on stack r3 #indicates waiting
         goto waiting
 
-    # zerostack_loop: pops the values off the stack until the counter hits 0    
+    # zerostack_loop: pops the values off the stack until the counter hits 0
     zerostack_loop:
         if (r4 == 0) goto r1
         pop stack r3
@@ -545,10 +548,10 @@
 
 
 .section text
-    ############################################################################
+    ###########################################################################
     # entering: grabs the most recent value off the value stack and multiplies
-    #       it by 10. Then it adds that number to the digit currently held in r4
-    #       and stores that result onto the value stack, then goes back to 
+    #       it by 10. Then it adds that number to the digit currently held in
+    #       r4 and stores that result onto the value stack, then goes back to
     #       waiting.
     # 
     # input
@@ -561,7 +564,7 @@
     #                 main
     #      val stack: new value, state
     #           note: r4 = first digit input, r1 = entering
-    ############################################################################
+    ###########################################################################
     entering:
         pop r4 off stack r3 # r4 = last digit input
         pop r1 off stack r3 # r1 = previous value
@@ -572,7 +575,7 @@
         push r5 on stack r3
         goto waiting
 
-    ############################################################################
+    ###########################################################################
     # waiting: pops the old value stack off of the call stack and pushes the 
     #       updated valuestack onto the call stack. Then it grabs the next
     #       character input and goes to waiting_with_character
@@ -585,20 +588,17 @@
     #     call stack: val stack, return address to main
     #      val stack: state
     #           note: r4 = input
-    ############################################################################
+    ###########################################################################
     waiting:
         pop r1 off stack r2     # add to main
         pop stack r2    #old valuestack
         push r3 on stack r2 #push value stack on call stack (m[0][r2 + 3])
         push r1 on stack r2
         r4 := input()
-        # r0 := ~r0
-        # if (r4 == r0) goto exit_prog using r5
-        # r0 := 0
         goto waiting_with_character
     
     
-    ############################################################################
+    ###########################################################################
     # waiting with character: checks for EOF, then goes to the character's spot
     #       in the jumptable. Then it pops off the old value stack and pushes
     #       the updated one again and goes back to waiting.
@@ -610,7 +610,7 @@
     #     call stack: val stack, return address to main
     #      val stack: state
     #           note: r4 = input, r5 = jumplocation
-    ############################################################################
+    ###########################################################################
     waiting_with_character:
         r5:= ~r4
         if (r5 == 0) goto exit_prog using r1
@@ -631,8 +631,8 @@
         output "'\n"
         goto waiting
 
-    ############################################################################
-    # main: sets r0 to 0 and sets r3 equal to the value stack. Goes to waiting.
+    ###########################################################################
+    # main: sets r0 to 0 and sets r3 equal to the value stack. Goes to waiting
     # 
     # input
     #     call stack: empty
@@ -642,7 +642,7 @@
     #     call stack: val stack, return address to main
     #      val stack: state
     #           note: 
-    ############################################################################
+    ###########################################################################
     main:
         r0 := 0
         r3 := endvalstack
