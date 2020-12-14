@@ -19,10 +19,20 @@
     init_table_loop:
         r5 := r5 + 1        
         m[r0][r5] := input_error
-        if (r4 >s r5) goto init_table_loop using r1 ######## this is the segfault issue
+        if (r4 >s r5) goto init_table_loop using r1
 
 #################################################################
 # number function
+# 
+# input
+#     call stack: val stack, return address to call main
+#      val stack: state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to callmain, return address to
+#                 main
+#      val stack: first digit of input, state
+#           note: r5 = entering or waiting, r3 = val stack
 #################################################################
 .section init 
     init_num_table:
@@ -37,17 +47,6 @@
         m[r0][jumptable + '8'] := number
         m[r0][jumptable + '9'] := number
 .section text
-    ############################################################################
-    # input
-    #     call stack: val stack, return address to call main
-    #      val stack: state
-    #           note: r4 = input, r5 = jumplocation
-    # output
-    #     call stack: val stack, return address to callmain, return address to
-    #                 main
-    #      val stack: first digit of input, state
-    #           note: r5 = entering or waiting, r3 = val stack
-    ############################################################################
     number:
         pop r5 off stack r3 #entering or waiting state = r5   
         r4 := r4 - 48       #convert to decimal
@@ -59,20 +58,19 @@
 
 #################################################################
 # space function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: value(whole number), state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: value, state
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + ' '] := space
 .section text
-    ############################################################################
-    # input
-    #     call stack: val stack, return address to main
-    #      val stack: value(whole number), state
-    #           note: r4 = input, r5 = jumplocation
-    # output
-    #     call stack: val stack, return address to main
-    #      val stack: value, state
-    #           note: r4 = input, r5 = jumplocation
-    ############################################################################
     space: 
         pop r5 off stack r3 #get state
         r5 := 0 #set to waiting
@@ -81,20 +79,19 @@
 
 #################################################################
 # newline function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: value(s), state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main, counter
+#      val stack: value(s)
+#           note: r4 = input, r5 = value
 #################################################################
 .section init 
     m[r0][jumptable + '\n'] := newline
 .section text #val stack = r3
-    ############################################################################
-    # input
-    #     call stack: val stack, return address to main
-    #      val stack: value(s), state
-    #           note: r4 = input, r5 = jumplocation
-    # output
-    #     call stack: val stack, return address to main, counter
-    #      val stack: value(s)
-    #           note: r4 = input, r5 = value
-    ############################################################################
     newline: #loop through val stack to print each item
         pop stack r3 #pops state off value stack
 
@@ -137,20 +134,19 @@
 
 #################################################################
 # add function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + '+'] := add
 .section text
-    ############################################################################
-    # input
-    #     call stack: val stack, return address to main
-    #      val stack: val1, val2, state
-    #           note: r4 = input, r5 = jumplocation
-    # output
-    #     call stack: val stack, return address to main
-    #      val stack: result, waiting
-    #           note: r4 = input, r5 = jumplocation
-    ############################################################################
     add:
         push r1 on stack r2
         goto check2 linking r1
@@ -166,6 +162,15 @@
 
 #################################################################
 # subtract function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + '-'] := sub
@@ -185,6 +190,15 @@
 
 #################################################################
 # multiply function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + '*'] := mul
@@ -204,6 +218,15 @@
 
 #################################################################
 # Division function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + '/'] := div
@@ -266,6 +289,15 @@
 
 #################################################################
 # or function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + '|'] := or
@@ -285,6 +317,15 @@
 
 #################################################################
 # and function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + '&'] := and
@@ -304,6 +345,15 @@
 
 #################################################################
 # change sign function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + 'c'] := changesign
@@ -322,6 +372,15 @@
 
 #################################################################
 # swap function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + 's'] := swap
@@ -341,6 +400,15 @@
 
 #################################################################
 # negation function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + '~'] := neg
@@ -359,6 +427,15 @@
 
 #################################################################
 # duplicate function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + 'd'] := dup
@@ -377,6 +454,15 @@
 
 #################################################################
 # popoff function
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + 'p'] := popoff
@@ -392,7 +478,16 @@
         goto waiting
 
 #################################################################
-# zerostack function -- figure this out i guess
+# zerostack function 
+# 
+# input
+#     call stack: val stack, return address to main
+#      val stack: val1, val2, state
+#           note: r4 = input, r5 = jumplocation
+# output
+#     call stack: val stack, return address to main
+#      val stack: result, waiting
+#           note: r4 = input, r5 = jumplocation
 #################################################################
 .section init 
     m[r0][jumptable + 'z'] := zerostack
@@ -417,6 +512,8 @@
 
 .section text
     ############################################################################
+    # entering
+    # 
     # input
     #     call stack: val stack, return address to callmain, return address to
     #                 main
@@ -439,6 +536,8 @@
         goto waiting
 
     ############################################################################
+    # waiting
+    # 
     # input
     #     call stack: val stack, return address to main
     #      val stack: state
@@ -453,11 +552,15 @@
         pop stack r2    #old valuestack
         push r3 on stack r2 #push value stack on call stack (m[0][r2 + 3])
         push r1 on stack r2
-        r4 := input() 
+        r4 := input()
+        # r0 := ~r0
+        # if (r4 == r0) goto exit_prog using r5
+        # r0 := 0
         goto waiting_with_character
     
     
     ############################################################################
+    # waiting with character
     # input
     #     call stack: val stack, return address to main
     #      val stack: state
@@ -468,6 +571,8 @@
     #           note: r4 = input, r5 = jumplocation
     ############################################################################
     waiting_with_character:
+        r5:= ~r4
+        if (r5 == 0) goto exit_prog using r1
         r5 := jumptable + r4
         r5 := m[r0][r5] #jump
         goto r5 linking r1
@@ -484,6 +589,8 @@
         goto waiting
 
     ############################################################################
+    # main
+    # 
     # input
     #     call stack: empty
     #      val stack: empty
@@ -502,10 +609,9 @@
         goto waiting linking r1
         #program goes to exit program on its own.
         pop r1 off stack r2
-
         goto r1
 
-    check1:
+    check1: #checks if there is at least one value on the val stack
         push r1 on stack r2
         push r4 on stack r2
         push r5 on stack r2
@@ -516,7 +622,7 @@
         pop r1 off stack r2
         goto r1
 
-    check2:
+    check2: #checks if there is at least 2 values on the val stack
         push r1 on stack r2
         push r4 on stack r2
         push r5 on stack r2
@@ -527,14 +633,14 @@
         pop r1 off stack r2
         goto r1
 
-    arg_error1:
+    arg_error1: #prints error if no values on val stack and returns to waiting
         output "Stack underflow---expected at least 1 element\n"
         pop r5 off stack r2
         pop r4 off stack r2
         pop r1 off stack r2
         goto waiting
 
-    arg_error2:
+    arg_error2: #prints error if 1 value on val stack and returns to waiting
         output "Stack underflow---expected at least 2 elements\n"
         pop r5 off stack r2
         pop r4 off stack r2
@@ -542,5 +648,20 @@
         goto waiting
 
     exit_prog:
-        output "program exiting"
+        r3 := m[r0][r2]
+        r4 := endvalstack - r3 #valstack counter
+        goto clear_valstack linking r1
+        r4 := endstack - r2 #valstack counter
+        goto clear_callstack linking r1
+        halt
+
+    clear_valstack:
+        if (r4 == 0) goto r1
+        pop stack r3
+
+    clear_callstack:
+        if (r4 == 0) goto r1
+        pop stack r2
+
+
         halt
