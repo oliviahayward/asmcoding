@@ -1,0 +1,23 @@
+Will McLeish, Olivia Hayward (wmclei01, ohaywa02)
+
+We received assistance for general debugging from Cindy Siu
+
+We believe that for the most part our program has been correctly implemented
+When we run tests with the random input generator we consistently pass for 100
+elements and under, however when we go higher than that, our program produces
+errors. We thought that this was due to our valuestack being too small, but we
+increased the size from 10,000 to 50,000 and still got errors. We are unsure
+about how to fix this.
+
+We did not differ from the standard calling conventions.
+
+We represent the value stack as stack of 10,000 elements, stored as the first
+thing on the call stack.
+
+comments for each section:
+
+We spent 893759847628 hours analyzing the assignment
+We spent 851643856432706578293467 hours writing the assembly code
+We spent 9564783926578463287964378265784365789243657894362758643782956478923657
+hours debugging our calculator
+
